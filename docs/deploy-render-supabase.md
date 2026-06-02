@@ -8,6 +8,21 @@ This path does **not** support custom domains — Render free tier serves the no
 
 ---
 
+## First — Choose the Operation
+
+Before doing anything else, ask the operator which task they want — do not assume "deploy". This document serves both new and already-deployed operators:
+
+1. **Deploy a new node** — run the full flow below, starting at "Deployment Flow".
+2. **Reset the operator password** — the node is already deployed and the operator is locked out of the admin console. Skip the entire deployment flow and go straight to "Resetting the Operator Password" near the end of this document.
+
+If the operator chooses reset (option 2), find the node's connection details in this order — only ask the operator as a last resort:
+
+1. **`deployment_log.md` in the current directory** — a previous deploy run writes it with the node's identifiers (Supabase project ref, Render service id, dashboard links).
+2. **The CLI tools** — an already-deployed operator is logged into `supabase` / `render`. Re-discover the project/service with `supabase projects list` and `render services list` (match on the node name), then read what you need from there.
+3. **Ask the operator** only if both of the above come up empty.
+
+---
+
 ## Behavior
 
 - Be concise. Show progress, not explanations. The operator doesn't need to know how Render's service-URL assignment works — they need a running node.
@@ -525,8 +540,8 @@ The output is a string starting with `$2a$12$` or `$2b$12$`. Capture it for Step
 
 Run this SQL against the node's Postgres. The hash is a literal string, so this works through **any** Postgres client — no extensions or special privileges required:
 
-- **Easiest:** open the Supabase dashboard → **SQL Editor**, paste, run.
-- **Or via `psql`** with the `DATABASE_URL` from the Render service (dashboard → Environment tab; ask the operator to paste it if you cannot read it).
+- **Easiest:** open the Supabase dashboard → **SQL Editor** for this node's project (project ref from `deployment_log.md`, or `supabase projects list`), paste, run.
+- **Or via `psql`** with the node's `DATABASE_URL` (from `deployment_log.md`, the Render service env via `render`, or — last resort — ask the operator to paste it).
 
 ```sql
 INSERT INTO node_settings (key, value)
